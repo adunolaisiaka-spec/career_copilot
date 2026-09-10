@@ -40,21 +40,32 @@ jobs:
     name: Integration tests (real test DB)
     runs-on: ubuntu-latest
     needs: build
-    # Only runs once a TEST_DATABASE_URL secret is configured — see README.md.
-    if: ${{ secrets.TEST_DATABASE_URL != '' }}
     env:
       TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+    # GitHub Actions doesn't allow `secrets` in a job-level `if:`, so each step
+    # below is individually gated on the job's own `env` instead — this job
+    # only does real work once a TEST_DATABASE_URL secret is configured (see
+    # README.md); otherwise every step is skipped and the job reports green.
     steps:
+      - name: Skip notice
+        if: ${{ env.TEST_DATABASE_URL == '' }}
+        run: echo "TEST_DATABASE_URL secret not set — skipping integration tests. See README.md."
+
       - uses: actions/checkout@v4
+        if: ${{ env.TEST_DATABASE_URL != '' }}
 
       - uses: actions/setup-node@v4
+        if: ${{ env.TEST_DATABASE_URL != '' }}
         with:
           node-version: 24
           cache: npm
 
       - run: npm ci
+        if: ${{ env.TEST_DATABASE_URL != '' }}
 
       - run: npx prisma generate
+        if: ${{ env.TEST_DATABASE_URL != '' }}
 
       - name: Integration tests
+        if: ${{ env.TEST_DATABASE_URL != '' }}
         run: npm run test:integration
