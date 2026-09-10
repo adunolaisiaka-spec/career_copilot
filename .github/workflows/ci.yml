@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    name: Typecheck, lint, build, unit tests
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://user:pass@localhost:5432/placeholder
+      AUTH_SECRET: ci-placeholder-secret-not-for-prod-use
+      NEXTAUTH_URL: http://localhost:3000
+      AI_PROVIDER: mock
+      STORAGE_PROVIDER: local
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx prisma generate
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build (includes Next.js's own type-check + static analysis)
+        run: npm run build
+
+      - name: Unit tests
+        run: npm test
+
+  integration:
+    name: Integration tests (real test DB)
+    runs-on: ubuntu-latest
+    needs: build
+    # Only runs once a TEST_DATABASE_URL secret is configured — see README.md.
+    if: ${{ secrets.TEST_DATABASE_URL != '' }}
+    env:
+      TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx prisma generate
+
+      - name: Integration tests
+        run: npm run test:integration

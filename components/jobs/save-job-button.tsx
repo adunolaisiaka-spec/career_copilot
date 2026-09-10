@@ -1,0 +1,31 @@
+"use client";
+
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+
+export function SaveJobButton({ jobId, initialSaved }: { jobId: string; initialSaved: boolean }) {
+  const router = useRouter();
+  const [saved, setSaved] = useState(initialSaved);
+  const [isPending, startTransition] = useTransition();
+
+  const toggle = () => {
+    const next = !saved;
+    setSaved(next);
+    startTransition(async () => {
+      await fetch(`/api/jobs/${jobId}/save`, { method: next ? "POST" : "DELETE" });
+      router.refresh();
+    });
+  };
+
+  return (
+    <Button
+      variant={saved ? "secondary" : "outline"}
+      size="sm"
+      disabled={isPending}
+      onClick={toggle}
+    >
+      {saved ? "Saved" : "Save"}
+    </Button>
+  );
+}
