@@ -10,7 +10,7 @@ import { getClientIp } from "@/lib/utilities/request";
 const RATE_LIMIT = { limit: 5, windowMs: 60 * 60 * 1000 }; // 5 registrations / hour / IP
 
 export async function POST(request: Request) {
-  const { allowed, retryAfterMs } = checkRateLimit(
+  const { allowed, retryAfterMs } = await checkRateLimit(
     `register:${getClientIp(request) ?? "unknown"}`,
     RATE_LIMIT,
   );

@@ -22,7 +22,7 @@ export const authConfig: NextAuthConfig = {
         const parsed = loginSchema.safeParse(credentials);
         if (!parsed.success) return null;
 
-        const { allowed } = checkRateLimit(`login:${parsed.data.email}`, LOGIN_RATE_LIMIT);
+        const { allowed } = await checkRateLimit(`login:${parsed.data.email}`, LOGIN_RATE_LIMIT);
         if (!allowed) return null;
 
         const user = await prisma.user.findUnique({

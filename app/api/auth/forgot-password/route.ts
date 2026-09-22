@@ -22,7 +22,7 @@ export async function POST(request: Request) {
 
   // Rate limit by the target email (not the caller) — this route's abuse case is
   // flooding one inbox with reset emails, not the requester making many requests.
-  const { allowed } = checkRateLimit(`forgot-password:${parsed.data.email}`, RATE_LIMIT);
+  const { allowed } = await checkRateLimit(`forgot-password:${parsed.data.email}`, RATE_LIMIT);
   if (!allowed) {
     return NextResponse.json({
       data: { message: "If an account exists for that email, a reset link has been sent." },

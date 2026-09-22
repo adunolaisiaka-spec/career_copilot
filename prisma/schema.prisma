@@ -559,3 +559,12 @@ model AuditLog {
   @@index([actorUserId])
   @@index([action])
 }
+
+// Postgres-backed fixed-window rate limiter (see lib/utilities/rate-limit.ts).
+// Replaces an in-memory Map, which reset on every cold serverless invocation
+// and gave no real protection once this app ran on Vercel.
+model RateLimitBucket {
+  key         String   @id
+  count       Int      @default(1)
+  windowStart DateTime @default(now())
+}

@@ -25,7 +25,7 @@ export async function PATCH(request: Request, { params }: RouteContext) {
   const user = await requireApiAuth();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { allowed, retryAfterMs } = checkRateLimit(`interview-evaluate:${user.id}`, RATE_LIMIT);
+  const { allowed, retryAfterMs } = await checkRateLimit(`interview-evaluate:${user.id}`, RATE_LIMIT);
   if (!allowed) {
     return NextResponse.json(
       { error: "You've reached the evaluation limit. Try again later." },

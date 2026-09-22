@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   const user = await requireApiAuth();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { allowed, retryAfterMs } = checkRateLimit(`interview-session:${user.id}`, RATE_LIMIT);
+  const { allowed, retryAfterMs } = await checkRateLimit(`interview-session:${user.id}`, RATE_LIMIT);
   if (!allowed) {
     return NextResponse.json(
       { error: "You've reached the interview session limit. Try again later." },

@@ -1,31 +1,43 @@
-interface Bucket {
+import { prisma } from "@/lib/database/prisma";
+
+interface BucketRow {
   count: number;
-  windowStart: number;
+  windowStart: Date;
 }
 
-const buckets = new Map<string, Bucket>();
-
 /**
- * Simple in-memory fixed-window rate limiter, keyed per caller (e.g. userId).
- * Good enough for a single dev/small-prod instance; swap the Map for Redis
- * (INCR + EXPIRE) if the app ever runs on multiple instances.
+ * Postgres-backed fixed-window rate limiter, keyed per caller (e.g. userId
+ * or email). Was previously an in-memory Map, which worked for one long-lived
+ * dev server but reset on every cold serverless invocation on Vercel — every
+ * "rate limited" endpoint was effectively unprotected in production. The
+ * upsert below is a single atomic statement so concurrent requests for the
+ * same key can't race each other into under-counting.
  */
-export function checkRateLimit(
+export async function checkRateLimit(
   key: string,
   { limit, windowMs }: { limit: number; windowMs: number },
-): { allowed: boolean; retryAfterMs: number } {
-  const now = Date.now();
-  const bucket = buckets.get(key);
+): Promise<{ allowed: boolean; retryAfterMs: number }> {
+  const cutoff = new Date(Date.now() - windowMs);
 
-  if (!bucket || now - bucket.windowStart >= windowMs) {
-    buckets.set(key, { count: 1, windowStart: now });
-    return { allowed: true, retryAfterMs: 0 };
+  const [row] = await prisma.$queryRaw<BucketRow[]>`
+    INSERT INTO "RateLimitBucket" ("key", "count", "windowStart")
+    VALUES (${key}, 1, now())
+    ON CONFLICT ("key") DO UPDATE SET
+      "count" = CASE
+        WHEN "RateLimitBucket"."windowStart" <= ${cutoff} THEN 1
+        ELSE "RateLimitBucket"."count" + 1
+      END,
+      "windowStart" = CASE
+        WHEN "RateLimitBucket"."windowStart" <= ${cutoff} THEN now()
+        ELSE "RateLimitBucket"."windowStart"
+      END
+    RETURNING "count", "windowStart"
+  `;
+
+  if (row.count > limit) {
+    const retryAfterMs = windowMs - (Date.now() - row.windowStart.getTime());
+    return { allowed: false, retryAfterMs: Math.max(0, retryAfterMs) };
   }
 
-  if (bucket.count >= limit) {
-    return { allowed: false, retryAfterMs: windowMs - (now - bucket.windowStart) };
-  }
-
-  bucket.count += 1;
   return { allowed: true, retryAfterMs: 0 };
 }

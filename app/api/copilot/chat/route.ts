@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   const user = await requireApiAuth();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { allowed, retryAfterMs } = checkRateLimit(`copilot-chat:${user.id}`, RATE_LIMIT);
+  const { allowed, retryAfterMs } = await checkRateLimit(`copilot-chat:${user.id}`, RATE_LIMIT);
   if (!allowed) {
     return NextResponse.json(
       { error: "You've reached the copilot message limit. Try again later." },
