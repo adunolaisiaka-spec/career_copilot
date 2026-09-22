@@ -48,7 +48,6 @@ export class AnthropicAIService implements AIService {
     const message = await this.client.messages.create({
       model: MODEL,
       max_tokens: 1024,
-      temperature: 0.2,
       system:
         "You are an expert resume reviewer and ATS (Applicant Tracking System) analyst. " +
         "Base your evaluation strictly on the resume text provided — never invent skills, " +
@@ -80,7 +79,6 @@ export class AnthropicAIService implements AIService {
     const message = await this.client.messages.create({
       model: MODEL,
       max_tokens: 1024,
-      temperature: 0.2,
       system:
         "You are an expert career coach comparing a candidate's resume against a specific job. " +
         "Base your evaluation strictly on the resume and job text provided — never invent skills, " +
@@ -120,7 +118,6 @@ export class AnthropicAIService implements AIService {
     const message = await this.client.messages.create({
       model: MODEL,
       max_tokens: 1024,
-      temperature: 0.4,
       system:
         "You are an expert cover letter writer. Write a concise, professional cover letter " +
         "(3-4 short paragraphs) based strictly on the candidate's actual resume content — never " +
@@ -149,7 +146,6 @@ export class AnthropicAIService implements AIService {
     const message = await this.client.messages.create({
       model: MODEL,
       max_tokens: 1024,
-      temperature: 0.5,
       system:
         "You are Career Copilot, an AI career assistant. Answer using only the information the " +
         "user has actually given you or that's in their profile context below — never invent " +
@@ -176,7 +172,6 @@ export class AnthropicAIService implements AIService {
     const message = await this.client.messages.create({
       model: MODEL,
       max_tokens: 1024,
-      temperature: 0.6,
       system:
         "You are an expert interview coach. Generate realistic interview questions for the " +
         "role described. Only generate questions — don't answer them. " +
@@ -209,7 +204,6 @@ export class AnthropicAIService implements AIService {
     const message = await this.client.messages.create({
       model: MODEL,
       max_tokens: 1536,
-      temperature: 0.3,
       system:
         "You are an expert interview coach evaluating a candidate's practice answers for a " +
         "specific role. Base your evaluation strictly on what the candidate actually wrote — " +
@@ -246,7 +240,6 @@ export class AnthropicAIService implements AIService {
     const message = await this.client.messages.create({
       model: MODEL,
       max_tokens: 1536,
-      temperature: 0.4,
       system:
         "You are an expert career coach building a step-by-step roadmap toward a candidate's " +
         "stated career goal. Base the plan strictly on the candidate's actual current role, " +
