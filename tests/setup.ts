@@ -20,3 +20,11 @@ try {
 if (process.env.TEST_DATABASE_URL) {
   process.env.DATABASE_URL = process.env.TEST_DATABASE_URL;
 }
+
+// Force the deterministic mock AI provider for every test run, regardless of
+// whether a real ANTHROPIC_API_KEY is present in .env. Without this, local
+// test runs silently call the real Anthropic API once a real key is added
+// for manual/dev use — costing real credits and making "(mock AI provider)"
+// tests non-deterministic (real model output isn't guaranteed to match the
+// strict response schemas the way the mock adapter is by construction).
+process.env.AI_PROVIDER = "mock";

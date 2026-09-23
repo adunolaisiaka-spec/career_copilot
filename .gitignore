@@ -2,6 +2,9 @@
 .env
 .env*.local
 
+# Claude Code personal settings (permission grants etc. — not shared/committed)
+.claude/settings.local.json
+
 # Temporary working files
 /temp/output/*
 /temp/resources/*
