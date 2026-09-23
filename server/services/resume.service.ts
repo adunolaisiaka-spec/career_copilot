@@ -12,18 +12,10 @@ const EXTENSION_BY_MIME: Record<string, string> = {
 
 async function extractText(buffer: Buffer, mimeType: string): Promise<string> {
   if (mimeType === "application/pdf") {
-    const { PDFParse } = await import("pdf-parse");
-    const parser = new PDFParse({ data: new Uint8Array(buffer) });
-    try {
-      const result = await parser.getText();
-      // Strip pdf-parse's own "-- N of M --" page-boundary markers — noise, not resume content.
-      return result.text
-        .replace(/^-- \d+ of \d+ --$/gm, "")
-        .replace(/\n{3,}/g, "\n\n")
-        .trim();
-    } finally {
-      await parser.destroy();
-    }
+    const { extractText: extractPdfText, getDocumentProxy } = await import("unpdf");
+    const pdf = await getDocumentProxy(new Uint8Array(buffer));
+    const { text } = await extractPdfText(pdf, { mergePages: true });
+    return text.replace(/\n{3,}/g, "\n\n").trim();
   }
 
   // Only PDF and DOCX are accepted (validated by the caller), so anything else is DOCX.
