@@ -7,14 +7,19 @@ export const markAllNotificationsRead = (userId: string) => repo.markAllRead(use
 export const deleteNotification = (userId: string, id: string) =>
   repo.deleteNotification(id, userId);
 
-export type NotificationType = "application_status_changed" | "goal_completed" | "resume_analyzed";
+export type NotificationType =
+  | "application_status_changed"
+  | "goal_completed"
+  | "resume_analyzed"
+  | "interview_reminder";
 
 /**
- * Creates an in-app notification. This is event-triggered (fires immediately when
- * something happens), not a scheduled reminder — there's no background job/cron
- * in this app yet, so true time-based reminders (e.g. "interview tomorrow") aren't
- * implemented. Email/push delivery can be layered on here later without changing
- * call sites, per the master spec's "design so these can be added later."
+ * Creates an in-app notification. Most call sites are event-triggered (fire
+ * immediately when something happens); server/services/reminder.service.ts
+ * is the one time-based exception, driven by a daily Vercel Cron job since
+ * there's no other background job runner in this app. Email/push delivery
+ * can be layered on here later without changing call sites, per the master
+ * spec's "design so these can be added later."
  */
 export async function notify(
   userId: string,
