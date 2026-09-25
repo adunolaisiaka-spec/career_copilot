@@ -15,6 +15,8 @@ import { CSS } from "@dnd-kit/utilities";
 import { APPLICATION_STATUSES } from "@/lib/validation/application";
 import type { listApplications } from "@/server/services/application.service";
 import { ApplicationDialog } from "@/components/applications/application-dialog";
+import { formatRelativeTime } from "@/lib/utilities/format-relative-time";
+import { MessagesSquare, ExternalLink } from "lucide-react";
 
 type Application = Awaited<ReturnType<typeof listApplications>>[number];
 type Status = (typeof APPLICATION_STATUSES)[number];
@@ -29,6 +31,21 @@ const STATUS_LABELS: Record<Status, string> = {
   OFFER: "Offer",
   REJECTED: "Rejected",
   WITHDRAWN: "Withdrawn",
+};
+
+// Tailwind needs to see full class names statically — no dynamic string
+// concatenation — so each status maps to a fixed dot color and an optional
+// tint used for the column's count badge.
+const STATUS_DOT: Record<Status, string> = {
+  SAVED: "bg-muted-foreground",
+  APPLIED: "bg-info",
+  SCREENING: "bg-warning",
+  INTERVIEW: "bg-primary",
+  TECHNICAL_INTERVIEW: "bg-primary",
+  FINAL_INTERVIEW: "bg-primary",
+  OFFER: "bg-success",
+  REJECTED: "bg-destructive",
+  WITHDRAWN: "bg-muted-foreground",
 };
 
 function ApplicationCard({
@@ -53,16 +70,26 @@ function ApplicationCard({
       {...listeners}
       {...attributes}
       onClick={onClick}
-      className="bg-card cursor-grab touch-none rounded-md border p-3 text-sm shadow-sm active:cursor-grabbing"
+      className="bg-card ring-foreground/10 hover:ring-primary/30 flex cursor-grab touch-none flex-col gap-1 rounded-lg p-3 text-sm shadow-sm ring-1 transition-shadow active:cursor-grabbing"
     >
       <div className="font-medium">{application.jobTitle}</div>
       <div className="text-muted-foreground">{application.companyName}</div>
-      {application.interviews.length > 0 && (
-        <div className="text-muted-foreground mt-1 text-xs">
-          {application.interviews.length} interview
-          {application.interviews.length > 1 ? "s" : ""} scheduled
-        </div>
-      )}
+      <div className="text-muted-foreground mt-1 flex items-center justify-between text-xs">
+        <span>
+          {application.appliedDate
+            ? `Applied ${formatRelativeTime(application.appliedDate)}`
+            : `Added ${formatRelativeTime(application.createdAt)}`}
+        </span>
+        <span className="flex items-center gap-2">
+          {application.jobLink && <ExternalLink className="size-3.5" />}
+          {application.interviews.length > 0 && (
+            <span className="flex items-center gap-0.5">
+              <MessagesSquare className="size-3.5" />
+              {application.interviews.length}
+            </span>
+          )}
+        </span>
+      </div>
     </div>
   );
 }
@@ -81,11 +108,14 @@ function KanbanColumn({
   return (
     <div
       ref={setNodeRef}
-      className={`flex w-64 shrink-0 flex-col gap-2 rounded-lg border p-3 ${isOver ? "bg-muted" : "bg-muted/30"}`}
+      className={`flex w-64 shrink-0 flex-col gap-2 rounded-xl border p-3 transition-colors ${isOver ? "border-primary/40 bg-primary/5" : "bg-muted/30"}`}
     >
       <div className="flex items-center justify-between text-sm font-semibold">
-        <span>{STATUS_LABELS[status]}</span>
-        <span className="text-muted-foreground">{applications.length}</span>
+        <span className="flex items-center gap-1.5">
+          <span className={`size-1.5 rounded-full ${STATUS_DOT[status]}`} aria-hidden />
+          {STATUS_LABELS[status]}
+        </span>
+        <span className="text-muted-foreground font-normal">{applications.length}</span>
       </div>
       <div className="flex flex-col gap-2">
         {applications.map((app) => (

@@ -12,42 +12,65 @@ import {
 
 export { listSkillCatalog } from "@/server/repositories/profile.repository";
 
+type CompletionProfile = Pick<
+  Profile,
+  | "fullName"
+  | "location"
+  | "careerLevel"
+  | "currentJobTitle"
+  | "desiredJobTitle"
+  | "desiredIndustry"
+  | "yearsExperience"
+  | "preferredWorkArrangement"
+  | "preferredLocation"
+  | "salaryExpectationMin"
+  | "professionalInterests"
+>;
+
+// Single source of truth for both the completion percentage and the
+// "what's missing" list shown on the profile page — keeping them as one
+// list of {label, met} checks means the two can never drift apart.
+function profileCompletionChecks(
+  profile: CompletionProfile,
+  hasEducation: boolean,
+  hasSkills: boolean,
+): { label: string; met: boolean }[] {
+  return [
+    { label: "your full name", met: Boolean(profile.fullName) },
+    { label: "your location", met: Boolean(profile.location) },
+    { label: "your career level", met: Boolean(profile.careerLevel) },
+    { label: "your current job title", met: Boolean(profile.currentJobTitle) },
+    { label: "your desired job title", met: Boolean(profile.desiredJobTitle) },
+    { label: "your desired industry", met: Boolean(profile.desiredIndustry) },
+    { label: "your years of experience", met: profile.yearsExperience !== null },
+    { label: "a preferred work arrangement", met: Boolean(profile.preferredWorkArrangement) },
+    { label: "a preferred location", met: Boolean(profile.preferredLocation) },
+    { label: "a salary expectation", met: profile.salaryExpectationMin !== null },
+    { label: "your professional interests", met: profile.professionalInterests.length > 0 },
+    { label: "your education", met: hasEducation },
+    { label: "your skills", met: hasSkills },
+  ];
+}
+
 export function calculateProfileCompletion(
-  profile: Pick<
-    Profile,
-    | "fullName"
-    | "location"
-    | "careerLevel"
-    | "currentJobTitle"
-    | "desiredJobTitle"
-    | "desiredIndustry"
-    | "yearsExperience"
-    | "preferredWorkArrangement"
-    | "preferredLocation"
-    | "salaryExpectationMin"
-    | "professionalInterests"
-  >,
+  profile: CompletionProfile,
   hasEducation: boolean,
   hasSkills: boolean,
 ): number {
-  const checks = [
-    Boolean(profile.fullName),
-    Boolean(profile.location),
-    Boolean(profile.careerLevel),
-    Boolean(profile.currentJobTitle),
-    Boolean(profile.desiredJobTitle),
-    Boolean(profile.desiredIndustry),
-    profile.yearsExperience !== null,
-    Boolean(profile.preferredWorkArrangement),
-    Boolean(profile.preferredLocation),
-    profile.salaryExpectationMin !== null,
-    profile.professionalInterests.length > 0,
-    hasEducation,
-    hasSkills,
-  ];
-
-  const filled = checks.filter(Boolean).length;
+  const checks = profileCompletionChecks(profile, hasEducation, hasSkills);
+  const filled = checks.filter((c) => c.met).length;
   return Math.round((filled / checks.length) * 100);
+}
+
+/** Human-readable labels for whatever's still missing, for the profile page's completion card. */
+export function getMissingProfileFields(
+  profile: CompletionProfile,
+  hasEducation: boolean,
+  hasSkills: boolean,
+): string[] {
+  return profileCompletionChecks(profile, hasEducation, hasSkills)
+    .filter((c) => !c.met)
+    .map((c) => c.label);
 }
 
 export async function getProfileForUser(userId: string) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Skill } from "@prisma/client";
@@ -13,14 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -137,12 +130,9 @@ export function ProfileForm({ skillCatalog, initialValues }: ProfileFormProps) {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Your profile</CardTitle>
-        <CardDescription>Keep this up to date for better AI recommendations.</CardDescription>
-      </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <CardContent className="flex flex-col gap-4">
+        <CardContent className="flex flex-col gap-4 pt-4">
+          <SectionHeading>Basic info</SectionHeading>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="fullName">Full name</Label>
             <Input id="fullName" {...register("fullName")} />
@@ -157,6 +147,8 @@ export function ProfileForm({ skillCatalog, initialValues }: ProfileFormProps) {
               <p className="text-destructive text-sm">{errors.location.message}</p>
             )}
           </div>
+
+          <SectionHeading>Career details</SectionHeading>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="careerLevel">Career level</Label>
             <Controller
@@ -205,6 +197,7 @@ export function ProfileForm({ skillCatalog, initialValues }: ProfileFormProps) {
               <p className="text-destructive text-sm">{errors.desiredIndustry.message}</p>
             )}
           </div>
+          <SectionHeading>Preferences</SectionHeading>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="preferredWorkArrangement">Preferred work arrangement</Label>
             <Controller
@@ -267,8 +260,8 @@ export function ProfileForm({ skillCatalog, initialValues }: ProfileFormProps) {
             />
           </div>
 
+          <SectionHeading>Skills</SectionHeading>
           <div className="flex flex-col gap-2">
-            <Label>Skills</Label>
             {Object.entries(skillsByCategory).map(([category, skills]) => (
               <div key={category} className="flex flex-col gap-2">
                 <Label className="text-muted-foreground text-xs uppercase">{category}</Label>
@@ -293,7 +286,7 @@ export function ProfileForm({ skillCatalog, initialValues }: ProfileFormProps) {
           </div>
 
           {serverError && <p className="text-destructive text-sm">{serverError}</p>}
-          {success && <p className="text-sm text-emerald-600">Profile updated.</p>}
+          {success && <p className="text-success text-sm">Profile updated.</p>}
         </CardContent>
         <CardFooter className="border-t-0 bg-transparent pt-2">
           <Button type="submit" disabled={isSubmitting}>
@@ -302,5 +295,13 @@ export function ProfileForm({ skillCatalog, initialValues }: ProfileFormProps) {
         </CardFooter>
       </form>
     </Card>
+  );
+}
+
+function SectionHeading({ children }: { children: ReactNode }) {
+  return (
+    <h2 className="text-muted-foreground border-t pt-4 text-xs font-semibold tracking-wide uppercase first:border-t-0 first:pt-0">
+      {children}
+    </h2>
   );
 }

@@ -1,6 +1,11 @@
 import { requireAuth } from "@/lib/auth/helpers";
-import { getProfileForUser, listSkillCatalog } from "@/server/services/profile.service";
+import {
+  getProfileForUser,
+  getMissingProfileFields,
+  listSkillCatalog,
+} from "@/server/services/profile.service";
 import { ProfileForm } from "@/components/profile/profile-form";
+import { CompletionCard } from "@/components/profile/completion-card";
 
 export default async function ProfilePage() {
   const user = await requireAuth();
@@ -9,8 +14,21 @@ export default async function ProfilePage() {
     listSkillCatalog(),
   ]);
 
+  const missingLabels = profile
+    ? getMissingProfileFields(profile, profile.educations.length > 0, skills.length > 0)
+    : [];
+
   return (
-    <div className="mx-auto max-w-2xl p-8">
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-6 sm:p-8">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Profile</h1>
+        <p className="text-muted-foreground text-sm">
+          Keep this up to date for stronger AI matches and recommendations.
+        </p>
+      </div>
+
+      <CompletionCard completion={profile?.profileCompletion ?? 0} missingLabels={missingLabels} />
+
       <ProfileForm
         skillCatalog={skillCatalog}
         initialValues={{

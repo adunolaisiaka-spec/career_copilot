@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Bot, MessageSquarePlus, Send, Sparkles, User } from "lucide-react";
+import { formatRelativeTime } from "@/lib/utilities/format-relative-time";
 
 const MARKDOWN_COMPONENTS = {
   p: ({ ...props }) => <p className="[&:not(:first-child)]:mt-2" {...props} />,
@@ -45,17 +46,6 @@ const SUGGESTED_PROMPTS = [
   "Find gaps in my current skills",
   "Create a career plan",
 ];
-
-function relativeTime(iso: string): string {
-  const diffMs = Date.now() - new Date(iso).getTime();
-  const minutes = Math.round(diffMs / 60000);
-  if (minutes < 1) return "Just now";
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.round(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.round(hours / 24);
-  return `${days}d ago`;
-}
 
 function ThinkingIndicator() {
   return (
@@ -201,7 +191,9 @@ export function CopilotChat({
               >
                 {c.title || "New conversation"}
               </span>
-              <span className="text-muted-foreground text-xs">{relativeTime(c.updatedAt)}</span>
+              <span className="text-muted-foreground text-xs">
+                {formatRelativeTime(c.updatedAt)}
+              </span>
             </button>
           ))}
         </div>

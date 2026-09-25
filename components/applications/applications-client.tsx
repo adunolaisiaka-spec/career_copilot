@@ -5,6 +5,7 @@ import type { listApplications } from "@/server/services/application.service";
 import { Button } from "@/components/ui/button";
 import { KanbanBoard } from "@/components/applications/kanban-board";
 import { ApplicationDialog } from "@/components/applications/application-dialog";
+import { Plus } from "lucide-react";
 
 type Application = Awaited<ReturnType<typeof listApplications>>[number];
 
@@ -14,7 +15,10 @@ export function ApplicationsClient({ applications }: { applications: Application
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-end">
-        <Button onClick={() => setCreateOpen(true)}>Add application</Button>
+        <Button onClick={() => setCreateOpen(true)}>
+          <Plus className="size-4" />
+          Add application
+        </Button>
       </div>
 
       <KanbanBoard applications={applications} />

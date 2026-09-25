@@ -11,9 +11,12 @@ export default async function ApplicationsPage() {
   ]);
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6 p-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Applications</h1>
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-6 sm:p-8">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Applications</h1>
+        <p className="text-muted-foreground text-sm">
+          Your career pipeline — drag a card to move it forward.
+        </p>
       </div>
 
       <StatsBar stats={stats} />

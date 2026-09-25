@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Bookmark, BookmarkCheck } from "lucide-react";
 
 export function SaveJobButton({ jobId, initialSaved }: { jobId: string; initialSaved: boolean }) {
   const router = useRouter();
@@ -25,6 +26,7 @@ export function SaveJobButton({ jobId, initialSaved }: { jobId: string; initialS
       disabled={isPending}
       onClick={toggle}
     >
+      {saved ? <BookmarkCheck className="size-3.5" /> : <Bookmark className="size-3.5" />}
       {saved ? "Saved" : "Save"}
     </Button>
   );
