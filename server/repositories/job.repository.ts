@@ -92,6 +92,17 @@ export function unsaveJob(userId: string, jobId: string) {
   return prisma.savedJob.deleteMany({ where: { userId, jobId } });
 }
 
+export function upsertExternalJob(
+  externalId: string,
+  data: Omit<Prisma.JobUncheckedCreateInput, "source" | "externalId">,
+) {
+  return prisma.job.upsert({
+    where: { source_externalId: { source: "EXTERNAL", externalId } },
+    create: { source: "EXTERNAL", externalId, ...data },
+    update: data,
+  });
+}
+
 export function distinctIndustries() {
   return prisma.job
     .findMany({ distinct: ["industry"], select: { industry: true } })
