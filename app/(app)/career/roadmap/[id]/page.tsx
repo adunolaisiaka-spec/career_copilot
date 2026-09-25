@@ -3,6 +3,8 @@ import { requireAuth } from "@/lib/auth/helpers";
 import { getRoadmap } from "@/server/services/career-roadmap.service";
 import { DeleteRoadmapButton } from "@/components/career/delete-roadmap-button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { PageHeader } from "@/components/layout/page-header";
+import { Map } from "lucide-react";
 
 interface StoredPhase {
   title: string;
@@ -24,9 +26,9 @@ export default async function RoadmapDetailPage({
   const phases = roadmap.phases as unknown as StoredPhase[];
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-6 p-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">{roadmap.goalTitle}</h1>
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-6 sm:p-8">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <PageHeader icon={Map} title={roadmap.goalTitle} />
         <DeleteRoadmapButton roadmapId={roadmap.id} />
       </div>
 

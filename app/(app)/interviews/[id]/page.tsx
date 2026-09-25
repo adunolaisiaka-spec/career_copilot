@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { requireAuth } from "@/lib/auth/helpers";
 import { getSession } from "@/server/services/interview.service";
 import { InterviewSessionClient } from "@/components/interviews/interview-session-client";
+import { PageHeader } from "@/components/layout/page-header";
+import { MessagesSquare } from "lucide-react";
 
 interface StoredSessionData {
   jobTitle: string;
@@ -31,13 +33,12 @@ export default async function InterviewSessionPage({
   const stored = session.questions as unknown as StoredSessionData;
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-6 p-8">
-      <div>
-        <h1 className="text-2xl font-semibold">{stored.jobTitle}</h1>
-        <p className="text-muted-foreground text-sm">
-          {session.mode === "MOCK" ? "Mock interview" : "Practice session"}
-        </p>
-      </div>
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-6 sm:p-8">
+      <PageHeader
+        icon={MessagesSquare}
+        title={stored.jobTitle}
+        description={session.mode === "MOCK" ? "Mock interview" : "Practice session"}
+      />
 
       <InterviewSessionClient
         sessionId={session.id}

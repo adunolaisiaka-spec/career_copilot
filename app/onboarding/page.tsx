@@ -15,7 +15,7 @@ export default async function OnboardingPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl p-8">
+    <div className="mx-auto w-full max-w-2xl p-6 sm:p-8">
       <OnboardingWizard
         skillCatalog={skillCatalog}
         initialValues={{

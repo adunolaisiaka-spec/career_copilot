@@ -6,6 +6,9 @@ import { useState } from "react";
 import type { listResumes } from "@/server/services/resume.service";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { FileText } from "lucide-react";
+import { scoreBadgeVariant } from "@/lib/utilities/score-variant";
 
 interface ResumeListProps {
   resumes: Awaited<ReturnType<typeof listResumes>>;
@@ -28,7 +31,8 @@ export function ResumeList({ resumes }: ResumeListProps) {
   if (resumes.length === 0) {
     return (
       <Card>
-        <CardHeader>
+        <CardHeader className="items-center text-center">
+          <FileText className="text-muted-foreground size-6" />
           <CardTitle className="text-base">No resumes yet</CardTitle>
           <CardDescription>Build one from scratch or analyze an uploaded file.</CardDescription>
         </CardHeader>
@@ -52,9 +56,13 @@ export function ResumeList({ resumes }: ResumeListProps) {
                     </span>
                   )}
                 </CardTitle>
-                <CardDescription>
-                  {resume.source === "UPLOADED" ? "Uploaded" : "Built"}
-                  {typeof latestScore === "number" && ` · Last score: ${latestScore}/100`}
+                <CardDescription className="flex items-center gap-1.5">
+                  <Badge variant="secondary">
+                    {resume.source === "UPLOADED" ? "Uploaded" : "Built"}
+                  </Badge>
+                  {typeof latestScore === "number" && (
+                    <Badge variant={scoreBadgeVariant(latestScore)}>{latestScore}/100</Badge>
+                  )}
                 </CardDescription>
               </div>
               <div className="flex gap-2">
@@ -88,7 +96,7 @@ export function ResumeList({ resumes }: ResumeListProps) {
                   disabled={deletingId === resume.id}
                   onClick={() => handleDelete(resume.id)}
                 >
-                  Delete
+                  {deletingId === resume.id ? "Deleting..." : "Delete"}
                 </Button>
               </div>
             </CardHeader>

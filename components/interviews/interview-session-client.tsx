@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface Question {
   question: string;
@@ -89,14 +90,26 @@ export function InterviewSessionClient({
           <CardContent className="flex flex-col gap-3">
             {strongAreas.length > 0 && (
               <div>
-                <h4 className="mb-1 text-xs font-semibold">Strong areas</h4>
-                <p className="text-muted-foreground text-sm">{strongAreas.join(", ")}</p>
+                <h4 className="mb-1.5 text-xs font-semibold">Strong areas</h4>
+                <div className="flex flex-wrap gap-1.5">
+                  {strongAreas.map((area) => (
+                    <Badge key={area} variant="success">
+                      {area}
+                    </Badge>
+                  ))}
+                </div>
               </div>
             )}
             {weakAreas.length > 0 && (
               <div>
-                <h4 className="mb-1 text-xs font-semibold">Areas to improve</h4>
-                <p className="text-muted-foreground text-sm">{weakAreas.join(", ")}</p>
+                <h4 className="mb-1.5 text-xs font-semibold">Areas to improve</h4>
+                <div className="flex flex-wrap gap-1.5">
+                  {weakAreas.map((area) => (
+                    <Badge key={area} variant="warning">
+                      {area}
+                    </Badge>
+                  ))}
+                </div>
               </div>
             )}
           </CardContent>

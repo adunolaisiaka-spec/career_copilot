@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { listNotifications } from "@/server/services/notification.service";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Bell } from "lucide-react";
 
 type Notification = Awaited<ReturnType<typeof listNotifications>>[number];
 
@@ -17,6 +18,7 @@ export function NotificationsClient({
 }) {
   const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [markingAll, setMarkingAll] = useState(false);
 
   const markRead = async (id: string) => {
     setBusyId(id);
@@ -39,24 +41,29 @@ export function NotificationsClient({
   };
 
   const markAllRead = async () => {
-    await fetch("/api/notifications/read-all", { method: "POST" });
-    router.refresh();
+    setMarkingAll(true);
+    try {
+      await fetch("/api/notifications/read-all", { method: "POST" });
+      router.refresh();
+    } finally {
+      setMarkingAll(false);
+    }
   };
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <p className="text-muted-foreground text-sm">{unread} unread</p>
-        {unread > 0 && (
-          <Button variant="outline" size="sm" onClick={markAllRead}>
-            Mark all as read
+      {unread > 0 && (
+        <div className="flex justify-end">
+          <Button variant="outline" size="sm" disabled={markingAll} onClick={markAllRead}>
+            {markingAll ? "Marking..." : "Mark all as read"}
           </Button>
-        )}
-      </div>
+        </div>
+      )}
 
       {notifications.length === 0 && (
         <Card>
-          <CardHeader>
+          <CardHeader className="items-center text-center">
+            <Bell className="text-muted-foreground size-6" />
             <CardTitle className="text-base">No notifications yet</CardTitle>
             <CardDescription>
               You&apos;ll see updates here when your applications or goals change status.
@@ -68,12 +75,17 @@ export function NotificationsClient({
       {notifications.map((n) => (
         <Card key={n.id} className={n.isRead ? "opacity-60" : undefined}>
           <CardHeader className="flex-row items-start justify-between">
-            <div>
-              <CardTitle className="text-base">{n.title}</CardTitle>
-              <CardDescription>{n.message}</CardDescription>
-              <p className="text-muted-foreground mt-1 text-xs">
-                {new Date(n.createdAt).toLocaleString()}
-              </p>
+            <div className="flex items-start gap-2">
+              {!n.isRead && (
+                <span className="bg-primary mt-1.5 size-1.5 shrink-0 rounded-full" aria-hidden />
+              )}
+              <div>
+                <CardTitle className="text-base">{n.title}</CardTitle>
+                <CardDescription>{n.message}</CardDescription>
+                <p className="text-muted-foreground mt-1 text-xs">
+                  {new Date(n.createdAt).toLocaleString()}
+                </p>
+              </div>
             </div>
             <div className="flex gap-2">
               {!n.isRead && (

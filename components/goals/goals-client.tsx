@@ -6,6 +6,7 @@ import type { listGoals } from "@/server/services/goal.service";
 import { GOAL_TERMS } from "@/lib/validation/goal";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { GoalDialog } from "@/components/goals/goal-dialog";
 
 type Goal = Awaited<ReturnType<typeof listGoals>>[number];
@@ -18,8 +19,8 @@ const TERM_LABELS: Record<(typeof GOAL_TERMS)[number], string> = {
 
 const STATUS_STYLES: Record<Goal["status"], string> = {
   NOT_STARTED: "text-muted-foreground",
-  IN_PROGRESS: "text-blue-600 dark:text-blue-400",
-  COMPLETED: "text-emerald-600 dark:text-emerald-400",
+  IN_PROGRESS: "text-info",
+  COMPLETED: "text-success",
   ABANDONED: "text-muted-foreground line-through",
 };
 
@@ -55,12 +56,7 @@ function GoalCard({ goal, onEdit }: { goal: Goal; onEdit: () => void }) {
       </CardHeader>
       <CardContent>
         <div className="flex items-center gap-3">
-          <div className="bg-muted h-2 flex-1 overflow-hidden rounded-full">
-            <div
-              className="bg-primary h-full rounded-full transition-all"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
+          <Progress value={progress} className="flex-1" />
           <input
             type="range"
             min={0}
@@ -71,9 +67,11 @@ function GoalCard({ goal, onEdit }: { goal: Goal; onEdit: () => void }) {
             onChange={(e) => setProgress(Number(e.target.value))}
             onMouseUp={(e) => commitProgress(Number(e.currentTarget.value))}
             onTouchEnd={(e) => commitProgress(Number(e.currentTarget.value))}
-            className="w-24"
+            className="accent-primary focus-visible:ring-ring/50 w-24 rounded focus-visible:ring-3 focus-visible:outline-none"
           />
-          <span className="text-muted-foreground w-10 text-right text-sm">{progress}%</span>
+          <span className="text-muted-foreground w-10 text-right text-sm tabular-nums">
+            {progress}%
+          </span>
         </div>
       </CardContent>
     </Card>

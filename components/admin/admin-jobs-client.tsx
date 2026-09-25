@@ -7,8 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Briefcase } from "lucide-react";
 
 type Job = Awaited<ReturnType<typeof listAllJobs>>[number];
+
+const NATIVE_SELECT_CLASS =
+  "border-input focus-visible:border-ring focus-visible:ring-ring/50 h-8 rounded-lg border bg-transparent px-2 text-sm outline-none transition-colors focus-visible:ring-3";
 
 export function AdminJobsClient({ jobs }: { jobs: Job[] }) {
   const router = useRouter();
@@ -77,10 +82,7 @@ export function AdminJobsClient({ jobs }: { jobs: Job[] }) {
             <Input name="title" placeholder="Job title" required />
             <Input name="company" placeholder="Company" required />
             <Input name="location" placeholder="Location" />
-            <select
-              name="remoteType"
-              className="border-input h-8 rounded-lg border bg-transparent px-2 text-sm"
-            >
+            <select name="remoteType" className={NATIVE_SELECT_CLASS}>
               <option value="">Any arrangement</option>
               <option value="REMOTE">Remote</option>
               <option value="HYBRID">Hybrid</option>
@@ -107,8 +109,11 @@ export function AdminJobsClient({ jobs }: { jobs: Job[] }) {
             <CardHeader className="flex-row items-start justify-between">
               <div>
                 <CardTitle className="text-base">{job.title}</CardTitle>
-                <CardDescription>
-                  {job.company} · {job.location} · {job.source}
+                <CardDescription className="flex items-center gap-1.5">
+                  {job.company} · {job.location}
+                  <Badge variant={job.source === "EXTERNAL" ? "info" : "secondary"}>
+                    {job.source === "EXTERNAL" ? "Synced" : "Manual"}
+                  </Badge>
                 </CardDescription>
               </div>
               <Button
@@ -117,12 +122,17 @@ export function AdminJobsClient({ jobs }: { jobs: Job[] }) {
                 disabled={deletingId === job.id}
                 onClick={() => handleDelete(job.id)}
               >
-                Delete
+                {deletingId === job.id ? "Deleting..." : "Delete"}
               </Button>
             </CardHeader>
           </Card>
         ))}
-        {jobs.length === 0 && <p className="text-muted-foreground text-sm">No jobs yet.</p>}
+        {jobs.length === 0 && (
+          <div className="flex flex-col items-center gap-2 py-8 text-center">
+            <Briefcase className="text-muted-foreground size-6" />
+            <p className="text-muted-foreground text-sm">No jobs yet — add one above.</p>
+          </div>
+        )}
       </div>
     </div>
   );

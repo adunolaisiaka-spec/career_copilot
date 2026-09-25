@@ -4,10 +4,13 @@ import { PLAN_FEATURES } from "@/lib/subscriptions/plans";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { UpgradeButton } from "@/components/settings/upgrade-button";
 import { ManageSubscriptionButton } from "@/components/settings/manage-subscription-button";
+import { PageHeader } from "@/components/layout/page-header";
+import { Settings as SettingsIcon } from "lucide-react";
 
 function UsageBar({ label, used, limit }: { label: string; used: number; limit: number }) {
   const isUnlimited = !Number.isFinite(limit);
   const pct = isUnlimited ? 0 : Math.min(100, Math.round((used / limit) * 100));
+  const barColor = pct >= 100 ? "bg-destructive" : pct >= 80 ? "bg-warning" : "bg-primary";
 
   return (
     <div className="flex flex-col gap-1">
@@ -20,7 +23,7 @@ function UsageBar({ label, used, limit }: { label: string; used: number; limit: 
       {!isUnlimited && (
         <div className="bg-muted h-2 overflow-hidden rounded-full">
           <div
-            className={`h-full rounded-full transition-all ${pct >= 100 ? "bg-destructive" : "bg-primary"}`}
+            className={`h-full rounded-full transition-all ${barColor}`}
             style={{ width: `${pct}%` }}
           />
         </div>
@@ -39,11 +42,11 @@ export default async function SettingsPage({
   const { checkout } = await searchParams;
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-6 p-8">
-      <h1 className="text-2xl font-semibold">Settings</h1>
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-6 sm:p-8">
+      <PageHeader icon={SettingsIcon} title="Settings" description="Manage your plan and account." />
 
       {checkout === "success" && (
-        <p className="rounded-lg border border-green-600/30 bg-green-600/10 p-3 text-sm text-green-700 dark:text-green-400">
+        <p className="border-success/30 bg-success/10 text-success rounded-lg border p-3 text-sm">
           Upgrade successful — welcome to Pro! It may take a few seconds for your plan to update
           below.
         </p>

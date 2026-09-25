@@ -35,6 +35,12 @@ const SCORE_LABELS: { key: keyof ResumeAnalysisResult; label: string }[] = [
   { key: "atsScore", label: "ATS compatibility" },
 ];
 
+function scoreColorClass(score: number): string {
+  if (score >= 80) return "text-success";
+  if (score >= 50) return "text-warning-foreground";
+  return "text-destructive";
+}
+
 export function ResumeAnalyzer({ resumes, initialResumeId }: ResumeAnalyzerProps) {
   const [mode, setMode] = useState<Mode>(resumes.length > 0 ? "existing" : "upload");
   const [resumeId, setResumeId] = useState(initialResumeId ?? resumes[0]?.id ?? "");
@@ -181,12 +187,15 @@ export function ResumeAnalyzer({ resumes, initialResumeId }: ResumeAnalyzerProps
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {SCORE_LABELS.map(({ key, label }) => (
-                <div key={key} className="rounded-md border p-3 text-center">
-                  <div className="text-lg font-semibold">{result[key]}</div>
-                  <div className="text-muted-foreground text-xs">{label}</div>
-                </div>
-              ))}
+              {SCORE_LABELS.map(({ key, label }) => {
+                const score = result[key] as number; // recommendations is the only non-number field on this type
+                return (
+                  <div key={key} className="rounded-md border p-3 text-center">
+                    <div className={`text-lg font-semibold ${scoreColorClass(score)}`}>{score}</div>
+                    <div className="text-muted-foreground text-xs">{label}</div>
+                  </div>
+                );
+              })}
             </div>
             <div>
               <h3 className="mb-2 text-sm font-semibold">Recommendations</h3>

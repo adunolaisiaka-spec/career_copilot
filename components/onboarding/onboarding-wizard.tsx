@@ -22,6 +22,7 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -159,6 +160,7 @@ export function OnboardingWizard({ skillCatalog, initialValues }: OnboardingWiza
         <CardDescription>
           Tell us about yourself so Career Copilot can personalize your experience.
         </CardDescription>
+        <Progress value={((step + 1) / STEPS.length) * 100} className="mt-2" />
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="flex flex-col gap-4">

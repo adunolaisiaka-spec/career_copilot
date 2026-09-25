@@ -23,7 +23,7 @@ export default async function EditResumePage({ params }: { params: Promise<{ id:
   const content = (resume.structuredContent ?? {}) as StructuredContent;
 
   return (
-    <div className="mx-auto max-w-2xl p-8">
+    <div className="mx-auto w-full max-w-2xl p-6 sm:p-8">
       <ResumeForm
         mode="edit"
         resumeId={resume.id}

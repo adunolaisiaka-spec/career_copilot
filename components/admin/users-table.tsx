@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { listUsers } from "@/server/services/admin.service";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Users } from "lucide-react";
 
 type User = Awaited<ReturnType<typeof listUsers>>[0][number];
 
@@ -64,15 +66,15 @@ export function UsersTable({ users, currentUserId }: { users: User[]; currentUse
               <tr key={user.id} className="border-t">
                 <td className="p-3">{user.profile?.fullName ?? "—"}</td>
                 <td className="p-3">{user.email}</td>
-                <td className="p-3">{user.role}</td>
                 <td className="p-3">
-                  <span
-                    className={
-                      user.status === "ACTIVE" ? "text-emerald-600" : "text-muted-foreground"
-                    }
-                  >
+                  <Badge variant={user.role === "ADMIN" ? "default" : "secondary"}>
+                    {user.role}
+                  </Badge>
+                </td>
+                <td className="p-3">
+                  <Badge variant={user.status === "ACTIVE" ? "success" : "outline"}>
                     {user.status}
-                  </span>
+                  </Badge>
                 </td>
                 <td className="p-3">{new Date(user.createdAt).toLocaleDateString()}</td>
                 <td className="flex gap-2 p-3">
@@ -102,7 +104,10 @@ export function UsersTable({ users, currentUserId }: { users: User[]; currentUse
           </tbody>
         </table>
         {users.length === 0 && (
-          <p className="text-muted-foreground p-6 text-center text-sm">No users found.</p>
+          <div className="flex flex-col items-center gap-2 p-8 text-center">
+            <Users className="text-muted-foreground size-6" />
+            <p className="text-muted-foreground text-sm">No users match this search.</p>
+          </div>
         )}
       </div>
     </div>

@@ -11,7 +11,7 @@ export default async function ResumeAnalyzerPage({
   const [resumes, { resumeId }] = await Promise.all([listResumes(user.id), searchParams]);
 
   return (
-    <div className="mx-auto max-w-2xl p-8">
+    <div className="mx-auto w-full max-w-2xl p-6 sm:p-8">
       <ResumeAnalyzer
         resumes={resumes.map((r) => ({ id: r.id, title: r.title }))}
         initialResumeId={resumeId}

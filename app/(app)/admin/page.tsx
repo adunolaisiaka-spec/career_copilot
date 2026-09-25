@@ -4,12 +4,16 @@ import { getAnalyticsSeries, getPlatformStats } from "@/server/services/admin.se
 import { TrendChart } from "@/components/admin/trend-chart";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { PageHeader } from "@/components/layout/page-header";
+import { ShieldCheck } from "lucide-react";
 
+// The chart-1..4 tokens (app/globals.css) exist specifically for this —
+// distinct, theme-consistent colors for data visualization.
 const CHART_COLORS = {
-  userGrowth: "#2a78d6",
-  applications: "#eb6834",
-  resumeAnalyses: "#1baf7a",
-  interviewSessions: "#eda100",
+  userGrowth: "var(--chart-1)",
+  applications: "var(--chart-4)",
+  resumeAnalyses: "var(--chart-2)",
+  interviewSessions: "var(--chart-3)",
 };
 
 export default async function AdminPage() {
@@ -25,12 +29,13 @@ export default async function AdminPage() {
   ];
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-6 p-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Admin Dashboard</h1>
-          <p className="text-muted-foreground text-sm">Signed in as {user.email}</p>
-        </div>
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 p-6 sm:p-8">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <PageHeader
+          icon={ShieldCheck}
+          title="Admin Dashboard"
+          description={`Signed in as ${user.email}`}
+        />
         <div className="flex gap-2">
           <Link href="/admin/users" className={buttonVariants({ variant: "outline", size: "sm" })}>
             Users

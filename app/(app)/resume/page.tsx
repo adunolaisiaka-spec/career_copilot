@@ -5,15 +5,21 @@ import { getBackground } from "@/server/services/background.service";
 import { BackgroundManager } from "@/components/resume/background-manager";
 import { ResumeList } from "@/components/resume/resume-list";
 import { buttonVariants } from "@/components/ui/button";
+import { PageHeader } from "@/components/layout/page-header";
+import { FileText } from "lucide-react";
 
 export default async function ResumePage() {
   const user = await requireAuth();
   const [resumes, background] = await Promise.all([listResumes(user.id), getBackground(user.id)]);
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-8 p-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">My Resume</h1>
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-8 p-6 sm:p-8">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <PageHeader
+          icon={FileText}
+          title="My Resume"
+          description="Build, upload, and get AI-scored feedback on your resume."
+        />
         <div className="flex gap-2">
           <Link href="/resume/analyzer" className={buttonVariants({ variant: "outline" })}>
             Analyze a resume
