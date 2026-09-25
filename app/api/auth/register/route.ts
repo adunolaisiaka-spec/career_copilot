@@ -6,6 +6,7 @@ import { createVerificationToken } from "@/lib/auth/tokens";
 import { sendMail } from "@/lib/mail/mailer";
 import { checkRateLimit } from "@/lib/utilities/rate-limit";
 import { getClientIp } from "@/lib/utilities/request";
+import { getBaseUrl } from "@/lib/utilities/base-url";
 
 const RATE_LIMIT = { limit: 5, windowMs: 60 * 60 * 1000 }; // 5 registrations / hour / IP
 
@@ -53,7 +54,7 @@ export async function POST(request: Request) {
   });
 
   const token = await createVerificationToken(user.id);
-  const verifyUrl = `${process.env.NEXTAUTH_URL ?? "http://localhost:3000"}/api/auth/verify-email?token=${token}`;
+  const verifyUrl = `${getBaseUrl()}/api/auth/verify-email?token=${token}`;
 
   await sendMail({
     to: user.email,

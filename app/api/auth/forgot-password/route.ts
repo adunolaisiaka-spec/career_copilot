@@ -4,6 +4,7 @@ import { forgotPasswordSchema } from "@/lib/validation/auth";
 import { createPasswordResetToken } from "@/lib/auth/tokens";
 import { sendMail } from "@/lib/mail/mailer";
 import { checkRateLimit } from "@/lib/utilities/rate-limit";
+import { getBaseUrl } from "@/lib/utilities/base-url";
 
 const RATE_LIMIT = { limit: 3, windowMs: 60 * 60 * 1000 }; // 3 reset emails / hour / address
 
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
 
   if (user) {
     const token = await createPasswordResetToken(user.id);
-    const resetUrl = `${process.env.NEXTAUTH_URL ?? "http://localhost:3000"}/reset-password?token=${token}`;
+    const resetUrl = `${getBaseUrl()}/reset-password?token=${token}`;
     await sendMail({
       to: user.email,
       subject: "Reset your Career Copilot password",
