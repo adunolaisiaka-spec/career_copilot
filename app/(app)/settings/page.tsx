@@ -2,6 +2,8 @@ import { requireAuth } from "@/lib/auth/helpers";
 import { getUsageSummary } from "@/server/services/subscription.service";
 import { PLAN_FEATURES } from "@/lib/subscriptions/plans";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { UpgradeButton } from "@/components/settings/upgrade-button";
+import { ManageSubscriptionButton } from "@/components/settings/manage-subscription-button";
 
 function UsageBar({ label, used, limit }: { label: string; used: number; limit: number }) {
   const isUnlimited = !Number.isFinite(limit);
@@ -27,13 +29,30 @@ function UsageBar({ label, used, limit }: { label: string; used: number; limit: 
   );
 }
 
-export default async function SettingsPage() {
+export default async function SettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ checkout?: string }>;
+}) {
   const user = await requireAuth();
   const usage = await getUsageSummary(user.id);
+  const { checkout } = await searchParams;
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6 p-8">
       <h1 className="text-2xl font-semibold">Settings</h1>
+
+      {checkout === "success" && (
+        <p className="rounded-lg border border-green-600/30 bg-green-600/10 p-3 text-sm text-green-700 dark:text-green-400">
+          Upgrade successful — welcome to Pro! It may take a few seconds for your plan to update
+          below.
+        </p>
+      )}
+      {checkout === "canceled" && (
+        <p className="text-muted-foreground rounded-lg border p-3 text-sm">
+          Checkout was canceled — you&apos;re still on the Free plan.
+        </p>
+      )}
 
       <Card>
         <CardHeader>
@@ -72,12 +91,7 @@ export default async function SettingsPage() {
             </ul>
           </div>
 
-          {usage.plan === "FREE" && (
-            <p className="text-muted-foreground text-sm">
-              Self-serve upgrades aren&apos;t available yet — reach out if you&apos;d like Pro
-              access.
-            </p>
-          )}
+          {usage.plan === "FREE" ? <UpgradeButton /> : <ManageSubscriptionButton />}
         </CardContent>
       </Card>
     </div>

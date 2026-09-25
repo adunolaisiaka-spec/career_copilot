@@ -1,7 +1,26 @@
 import { prisma } from "@/lib/database/prisma";
+import type { Prisma } from "@prisma/client";
 
 export function findSubscriptionByUserId(userId: string) {
   return prisma.subscription.findUnique({ where: { userId } });
+}
+
+export function findSubscriptionByProviderCustomerId(providerCustomerId: string) {
+  return prisma.subscription.findFirst({ where: { providerCustomerId } });
+}
+
+export function updateSubscriptionByUserId(
+  userId: string,
+  data: Prisma.SubscriptionUncheckedUpdateInput,
+) {
+  return prisma.subscription.update({ where: { userId }, data });
+}
+
+export function updateSubscriptionByProviderCustomerId(
+  providerCustomerId: string,
+  data: Prisma.SubscriptionUncheckedUpdateInput,
+) {
+  return prisma.subscription.updateMany({ where: { providerCustomerId }, data });
 }
 
 export function countApplications(userId: string) {
